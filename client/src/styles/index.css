@@ -1,0 +1,248 @@
+:root {
+  --bg: #0a0a0a;
+  --fg: #e5e5e5;
+  --accent: #6366f1;
+  --border: #262626;
+  --surface: #141414;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page h1 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  background: var(--surface);
+}
+
+/* Contact links */
+.contact-link {
+  display: block;
+  color: inherit;
+}
+.contact-link:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* Contact detail header */
+.contact-header {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.contact-header h1 {
+  margin-bottom: 0.5rem;
+}
+.contact-meta {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* Interactions section */
+.interactions-section {
+  margin-top: 2rem;
+}
+.interactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.interactions-header h2 {
+  font-size: 1.3rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.btn:hover {
+  border-color: var(--accent);
+}
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+.btn-sm {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+.btn-danger {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+.btn-danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.timeline-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+.timeline-row:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+.timeline-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+.timeline-type {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  margin-right: 0.5rem;
+}
+.timeline-summary {
+  color: var(--fg);
+  font-size: 0.9rem;
+}
+.timeline-date {
+  color: #777;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.timeline-chevron {
+  color: #555;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.timeline-details {
+  padding: 0.75rem 1rem 1rem 3.2rem;
+  border-top: 1px solid var(--border);
+}
+.timeline-details-text {
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+.timeline-details-text.empty {
+  color: #555;
+  font-style: italic;
+}
+.timeline-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Interaction form */
+.interaction-form {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.interaction-form h3 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+.form-row {
+  margin-bottom: 0.75rem;
+}
+.form-row label {
+  display: block;
+  font-size: 0.8rem;
+  color: #999;
+  margin-bottom: 0.25rem;
+}
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.form-row textarea {
+  resize: vertical;
+}
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  color: #555;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}

@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import contactsRouter from './routes/contacts.js';
 import companiesRouter from './routes/companies.js';
 import interactionsRouter from './routes/interactions.js';
-import remindersRouter from './routes/reminders.js';
+import remindersRouter, { contactRemindersHandler } from './routes/reminders.js';
 import groupsRouter from './routes/groups.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -28,6 +28,7 @@ app.use('/api/contacts', contactsRouter);
 app.use('/api/companies', companiesRouter);
 app.use('/api/interactions', interactionsRouter);
 app.use('/api/reminders', remindersRouter);
+app.post('/api/contacts/:contactId/reminders', contactRemindersHandler);
 app.use('/api/groups', groupsRouter);
 
 // Error handler

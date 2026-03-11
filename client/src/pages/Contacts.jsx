@@ -25,6 +25,13 @@ export default function Contacts() {
   const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
   const tagRef = useRef(null);
 
+  // Selection & bulk actions
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkAction, setBulkAction] = useState(null); // 'add_to_group' | 'add_tags' | null
+  const [bulkGroupId, setBulkGroupId] = useState('');
+  const [bulkTagInput, setBulkTagInput] = useState('');
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+
   // Debounce search
   const [debouncedSearch, setDebouncedSearch] = useState('');
   useEffect(() => {
@@ -88,6 +95,11 @@ export default function Contacts() {
     fetchContacts();
   }, [fetchContacts]);
 
+  // Clear selection when data changes
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [contacts]);
+
   const toggleTag = (tag) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
@@ -130,7 +142,7 @@ export default function Contacts() {
     });
   };
 
-  // Tag colors — deterministic from tag string
+  // Tag colors
   const tagColors = [
     '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316',
     '#eab308', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6',
@@ -142,6 +154,91 @@ export default function Contacts() {
     return h;
   }
 
+  // Selection helpers
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === contacts.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(contacts.map((c) => c.id));
+    }
+  };
+
+  // Bulk actions
+  const executeBulkAction = async (action) => {
+    if (selectedIds.length === 0) return;
+    setBulkProcessing(true);
+
+    try {
+      if (action === 'delete') {
+        if (!confirm(`Delete ${selectedIds.length} contact(s)? This cannot be undone.`)) {
+          setBulkProcessing(false);
+          return;
+        }
+        await fetch(`${API_BASE}/api/contacts/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contact_ids: selectedIds, action: 'delete' }),
+        });
+        setSelectedIds([]);
+        fetchContacts();
+      } else if (action === 'add_to_group') {
+        setBulkAction('add_to_group');
+      } else if (action === 'add_tags') {
+        setBulkAction('add_tags');
+      }
+    } catch {
+      // ignore
+    }
+    setBulkProcessing(false);
+  };
+
+  const confirmBulkGroup = async () => {
+    if (!bulkGroupId) return;
+    setBulkProcessing(true);
+    try {
+      await fetch(`${API_BASE}/api/contacts/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact_ids: selectedIds, action: 'add_to_group', group_id: bulkGroupId }),
+      });
+      setBulkAction(null);
+      setBulkGroupId('');
+      setSelectedIds([]);
+      fetchContacts();
+    } catch {
+      // ignore
+    }
+    setBulkProcessing(false);
+  };
+
+  const confirmBulkTags = async () => {
+    const tags = bulkTagInput.split(',').map((t) => t.trim()).filter(Boolean);
+    if (tags.length === 0) return;
+    setBulkProcessing(true);
+    try {
+      await fetch(`${API_BASE}/api/contacts/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contact_ids: selectedIds, action: 'add_tags', tags }),
+      });
+      setBulkAction(null);
+      setBulkTagInput('');
+      setSelectedIds([]);
+      fetchContacts();
+      // Refresh tags
+      fetch(`${API_BASE}/api/contacts/tags`).then((r) => r.json()).then(setAllTags).catch(() => {});
+    } catch {
+      // ignore
+    }
+    setBulkProcessing(false);
+  };
+
   return (
     <div className="page contacts-page">
       <div className="contacts-header">
@@ -149,6 +246,7 @@ export default function Contacts() {
           <Link to="/" className="back-link">← Dashboard</Link>
           <h1>Contacts {!loading && <span className="count">({total})</span>}</h1>
         </div>
+        <Link to="/groups" className="btn-nav">Groups →</Link>
       </div>
 
       {/* Search & Filters Bar */}
@@ -224,6 +322,55 @@ export default function Contacts() {
         </div>
       )}
 
+      {/* Bulk action bar */}
+      {selectedIds.length > 0 && (
+        <div className="bulk-bar">
+          <span className="bulk-count">{selectedIds.length} selected</span>
+          <button className="bulk-btn" onClick={() => executeBulkAction('add_to_group')} disabled={bulkProcessing}>
+            Add to Group
+          </button>
+          <button className="bulk-btn" onClick={() => executeBulkAction('add_tags')} disabled={bulkProcessing}>
+            Add Tags
+          </button>
+          <button className="bulk-btn bulk-btn-danger" onClick={() => executeBulkAction('delete')} disabled={bulkProcessing}>
+            Delete
+          </button>
+          <button className="bulk-btn-cancel" onClick={() => setSelectedIds([])}>
+            Deselect
+          </button>
+        </div>
+      )}
+
+      {/* Bulk action sub-modals */}
+      {bulkAction === 'add_to_group' && (
+        <div className="bulk-sub-bar">
+          <select value={bulkGroupId} onChange={(e) => setBulkGroupId(e.target.value)} className="filter-select">
+            <option value="">Select group...</option>
+            {groups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+          </select>
+          <button className="bulk-btn" onClick={confirmBulkGroup} disabled={!bulkGroupId || bulkProcessing}>
+            {bulkProcessing ? 'Adding...' : 'Confirm'}
+          </button>
+          <button className="bulk-btn-cancel" onClick={() => setBulkAction(null)}>Cancel</button>
+        </div>
+      )}
+      {bulkAction === 'add_tags' && (
+        <div className="bulk-sub-bar">
+          <input
+            type="text"
+            className="bulk-tag-input"
+            placeholder="Enter tags (comma-separated)"
+            value={bulkTagInput}
+            onChange={(e) => setBulkTagInput(e.target.value)}
+            autoFocus
+          />
+          <button className="bulk-btn" onClick={confirmBulkTags} disabled={!bulkTagInput.trim() || bulkProcessing}>
+            {bulkProcessing ? 'Adding...' : 'Confirm'}
+          </button>
+          <button className="bulk-btn-cancel" onClick={() => setBulkAction(null)}>Cancel</button>
+        </div>
+      )}
+
       {/* Content */}
       {loading ? (
         <div className="loading-state">
@@ -250,6 +397,13 @@ export default function Contacts() {
             <table className="contacts-table">
               <thead>
                 <tr>
+                  <th className="check-col">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.length === contacts.length && contacts.length > 0}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
                   <th className="sortable" onClick={() => handleSort('name')}>
                     Name {sortIcon('name')}
                   </th>
@@ -266,7 +420,14 @@ export default function Contacts() {
               </thead>
               <tbody>
                 {contacts.map((c) => (
-                  <tr key={c.id}>
+                  <tr key={c.id} className={selectedIds.includes(c.id) ? 'row-selected' : ''}>
+                    <td className="check-col">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(c.id)}
+                        onChange={() => toggleSelect(c.id)}
+                      />
+                    </td>
                     <td className="contact-name">
                       <div className="avatar">
                         {c.avatar_url ? (

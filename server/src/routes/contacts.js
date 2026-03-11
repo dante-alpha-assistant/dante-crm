@@ -182,6 +182,85 @@ router.patch('/:id', async (req, res, next) => {
   }
 });
 
+// Bulk actions on contacts
+// Body: { contact_ids: [...], action: "add_to_group" | "add_tags" | "remove_tags" | "delete", group_id?: "...", tags?: [...] }
+router.post('/bulk', async (req, res, next) => {
+  try {
+    const { contact_ids, action, group_id, tags } = req.body;
+
+    if (!contact_ids || contact_ids.length === 0) {
+      return res.status(400).json({ error: 'contact_ids required' });
+    }
+
+    switch (action) {
+      case 'add_to_group': {
+        if (!group_id) return res.status(400).json({ error: 'group_id required' });
+        const rows = contact_ids.map((cid) => ({ group_id, contact_id: cid }));
+        const { error } = await supabase
+          .from('contact_group_members')
+          .upsert(rows, { onConflict: 'contact_id,group_id', ignoreDuplicates: true });
+        if (error) throw error;
+        return res.json({ ok: true, action, affected: contact_ids.length });
+      }
+
+      case 'add_tags': {
+        if (!tags || tags.length === 0) return res.status(400).json({ error: 'tags required' });
+        // Fetch current tags for each contact, merge, then update
+        const { data: contacts, error: fErr } = await supabase
+          .from('contacts')
+          .select('id, tags')
+          .in('id', contact_ids);
+        if (fErr) throw fErr;
+
+        const updates = (contacts || []).map((c) => {
+          const existing = Array.isArray(c.tags) ? c.tags : [];
+          const merged = [...new Set([...existing, ...tags])];
+          return supabase
+            .from('contacts')
+            .update({ tags: merged, updated_at: new Date().toISOString() })
+            .eq('id', c.id);
+        });
+        await Promise.all(updates);
+        return res.json({ ok: true, action, affected: contact_ids.length });
+      }
+
+      case 'remove_tags': {
+        if (!tags || tags.length === 0) return res.status(400).json({ error: 'tags required' });
+        const { data: contacts, error: fErr } = await supabase
+          .from('contacts')
+          .select('id, tags')
+          .in('id', contact_ids);
+        if (fErr) throw fErr;
+
+        const updates = (contacts || []).map((c) => {
+          const existing = Array.isArray(c.tags) ? c.tags : [];
+          const filtered = existing.filter((t) => !tags.includes(t));
+          return supabase
+            .from('contacts')
+            .update({ tags: filtered, updated_at: new Date().toISOString() })
+            .eq('id', c.id);
+        });
+        await Promise.all(updates);
+        return res.json({ ok: true, action, affected: contact_ids.length });
+      }
+
+      case 'delete': {
+        const { error } = await supabase
+          .from('contacts')
+          .delete()
+          .in('id', contact_ids);
+        if (error) throw error;
+        return res.json({ ok: true, action, affected: contact_ids.length });
+      }
+
+      default:
+        return res.status(400).json({ error: `Unknown action: ${action}` });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Delete contact
 router.delete('/:id', async (req, res, next) => {
   try {

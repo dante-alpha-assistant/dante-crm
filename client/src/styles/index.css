@@ -246,3 +246,189 @@ li {
   text-align: center;
   padding: 2rem;
 }
+
+/* Navigation */
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.nav-brand a {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+.nav-brand a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+.nav-links a {
+  color: #999;
+  font-size: 0.9rem;
+}
+.nav-links a:hover,
+.nav-links a.nav-active {
+  color: var(--fg);
+  text-decoration: none;
+}
+.nav-reminders {
+  position: relative;
+}
+.nav-badge {
+  position: absolute;
+  top: -8px;
+  right: -14px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+.tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: #999;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.tab:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+.tab-active {
+  border-color: var(--accent);
+  color: var(--fg);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Reminder list */
+.reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.reminder-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.reminder-overdue {
+  border-color: #ef4444;
+}
+.reminder-snoozed {
+  opacity: 0.7;
+}
+.reminder-done {
+  opacity: 0.5;
+}
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+.reminder-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.reminder-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.reminder-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.reminder-contact {
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+.reminder-due {
+  font-size: 0.8rem;
+  color: #777;
+}
+.reminder-snooze-info {
+  color: #f59e0b;
+}
+.reminder-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+/* Snooze options */
+.snooze-options {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem 1rem 0.75rem 3rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.snooze-custom {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+}
+.snooze-custom input {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 0.8rem;
+}
+
+/* Reminders section on contact detail */
+.reminders-section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Completed reminders collapsible */
+.completed-reminders {
+  margin-top: 0.75rem;
+}
+.completed-reminders summary {
+  cursor: pointer;
+  color: #777;
+  font-size: 0.85rem;
+  padding: 0.5rem 0;
+}
+
+/* Dashboard sections */
+.dashboard-section {
+  margin-bottom: 2rem;
+}
+.dashboard-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+.dashboard-links {
+  margin-top: 1rem;
+}

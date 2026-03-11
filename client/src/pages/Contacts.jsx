@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function Contacts() {
@@ -22,15 +23,17 @@ export default function Contacts() {
   return (
     <div className="page">
       <h1>Contacts</h1>
-      <a href="/">← Dashboard</a>
+      <Link to="/">← Dashboard</Link>
       {contacts.length === 0 ? (
         <p>No contacts yet. Add your first contact to get started.</p>
       ) : (
         <ul>
           {contacts.map((c) => (
             <li key={c.id}>
-              <strong>{c.name}</strong> {c.email && `— ${c.email}`}
-              {c.company && ` @ ${c.company}`}
+              <Link to={`/contacts/${c.id}`} className="contact-link">
+                <strong>{c.name}</strong> {c.email && `— ${c.email}`}
+                {c.company && ` @ ${c.company}`}
+              </Link>
             </li>
           ))}
         </ul>

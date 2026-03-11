@@ -67,4 +67,32 @@ router.delete('/:id', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// --- Nested interaction routes ---
+
+// List interactions for a contact
+router.get('/:id/interactions', async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('interactions')
+      .select('*')
+      .eq('contact_id', req.params.id)
+      .order('occurred_at', { ascending: false });
+    if (error) throw error;
+    res.json(data);
+  } catch (err) { next(err); }
+});
+
+// Create interaction for a contact
+router.post('/:id/interactions', async (req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('interactions')
+      .insert({ ...req.body, contact_id: req.params.id })
+      .select()
+      .single();
+    if (error) throw error;
+    res.status(201).json(data);
+  } catch (err) { next(err); }
+});
+
 export default router;
